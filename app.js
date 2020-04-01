@@ -28,6 +28,7 @@ const renderCafe = doc => {
 };
 
 db.collection('cafes')
+	.orderBy('name')
 	.get()
 	.then(snapshot => {
 		snapshot.docs.map(item => {
