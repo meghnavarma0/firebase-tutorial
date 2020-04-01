@@ -27,14 +27,15 @@ const renderCafe = doc => {
 	});
 };
 
-db.collection('cafes')
-	.orderBy('name')
-	.get()
-	.then(snapshot => {
-		snapshot.docs.map(item => {
-			renderCafe(item);
-		});
-	});
+// db.collection('cafes')
+// 	.where('city', '==', 'lucknow')
+// 	.orderBy('name')
+// 	.get()
+// 	.then(snapshot => {
+// 		snapshot.docs.map(item => {
+// 			renderCafe(item);
+// 		});
+// 	});
 document.addEventListener('submit', e => {
 	e.preventDefault();
 	db.collection('cafes').add({
@@ -44,3 +45,20 @@ document.addEventListener('submit', e => {
 	form.name.value = '';
 	form.city.value = '';
 });
+
+//real-time listener
+db.collection('cafes')
+	.orderBy('city')
+	.onSnapshot(snapshot => {
+		let changes = snapshot.docChanges();
+		changes.forEach(change => {
+			if (change.type == 'added') {
+				renderCafe(change.doc);
+			} else if (change.type == 'removed') {
+				let li = cafeList.querySelector(
+					'[data-id=' + change.doc.id + ']'
+				);
+				cafeList.removeChild(li);
+			}
+		});
+	});
